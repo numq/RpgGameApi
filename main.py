@@ -132,7 +132,7 @@ DEBUG
 """
 
 
-@app.route('/generate', methods=['GET', 'POST'])
+@app.route('/generate', methods=['POST'])
 @auto.doc(groups='private', set_location=False)
 def generate_dungeon():
     rand_name = Randomizer.random_name(20)
