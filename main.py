@@ -50,7 +50,6 @@ class DungeonSchema(ma.Schema):
 
 
 class User(db.Model):
-    __tablename__ = 'users'
 
     user_token = Column('user_token', Integer, primary_key=True)
     registration_datetime = Column('registration_datetime', DateTime)
@@ -64,7 +63,6 @@ class User(db.Model):
 
 
 class Character(db.Model):
-    __tablename__ = 'characters'
 
     user_token = Column('user_token', Integer, nullable=False)
     id = Column('id', Integer, primary_key=True)
@@ -84,7 +82,6 @@ class Character(db.Model):
 
 
 class Dungeon(db.Model):
-    __tablename__ = 'dungeons'
 
     id = Column('id', Integer, primary_key=True, default=uuid.uuid4, nullable=False)
     name = Column('name', String(20), nullable=False)
