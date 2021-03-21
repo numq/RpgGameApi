@@ -1,0 +1,1 @@
+DbEntryExists = ('DATABASE: ENTRY ALREADY EXISTS', 409)
