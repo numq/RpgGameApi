@@ -17,7 +17,6 @@ class TestItem:
             new_dungeon = client.post('/dungeons/generate')
             dungeon_id = new_dungeon.json['id']
 
-            test_id = client.get('/characters').json[-1]['id']
             response = client.post('/inventory/%s/drop' % character_id,
                                    json=json.loads(json.dumps({u'dungeon_id': dungeon_id})))
             client.delete('/dungeons/%s' % dungeon_id)
