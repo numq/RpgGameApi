@@ -1,12 +1,11 @@
-from flask import request, jsonify, json, Blueprint
+from flask import request, jsonify, json
 
+from app.blueprints import bp_character
+from app.extensions import db
 from app.utilities import constants, exceptions
 from app.utilities.generators import CharacterGenerator
-from database.models import Character, User
+from database import models
 from database.schemes import character_schema, characters_schema
-from main import db
-
-bp_character = Blueprint('character', __name__)
 
 
 # Create a Character
@@ -24,9 +23,10 @@ def create_character():
     gold = constants.NEW_CHAR_GOLD
     inventory = json.dumps(list())
 
-    new_character = Character(user_id=user_id, name=name, level=level, stats=stats, hp=hp, energy=energy,
-                              experience=experience, gold=gold, inventory=inventory)
-    if db.session.query(User).filter_by(id=new_character.user_id).count() > 0 and db.session.query(Character).filter_by(
+    new_character = models.Character(user_id=user_id, name=name, level=level, stats=stats, hp=hp, energy=energy,
+                                     experience=experience, gold=gold, inventory=inventory)
+    if db.session.query(models.User).filter_by(id=new_character.user_id).count() > 0 and db.session.query(
+            models.Character).filter_by(
             user_id=new_character.user_id, id=new_character.id).count() < 1:
         db.session.add(new_character)
         db.session.commit()
@@ -38,7 +38,7 @@ def create_character():
 # Get All Characters
 @bp_character.route('/characters', methods=['GET'])
 def get_all_characters():
-    all_characters = Character.query.all()
+    all_characters = models.Character.query.all()
     result = characters_schema.dump(all_characters)
     return jsonify(result)
 
@@ -46,7 +46,7 @@ def get_all_characters():
 # Get Characters
 @bp_character.route('/users/<user_id>/characters', methods=['GET'])
 def get_characters(user_id=None):
-    characters = db.session.query(Character).filter_by(user_id=user_id).all()
+    characters = db.session.query(models.Character).filter_by(user_id=user_id).all()
     result = characters_schema.dump(characters)
     return jsonify(result)
 
@@ -54,14 +54,14 @@ def get_characters(user_id=None):
 # Get Single Character
 @bp_character.route('/characters/<id>', methods=['GET'])
 def get_character(id=None):
-    character = Character.query.get(id)
+    character = models.Character.query.get(id)
     return character_schema.jsonify(character)
 
 
 # Update a Character
 @bp_character.route('/characters/<id>', methods=['PUT'])
 def update_character(id=None):
-    character = Character.query.get(id)
+    character = models.Character.query.get(id)
 
     name = request.json['name']
     level = request.json['level']
@@ -89,7 +89,7 @@ def update_character(id=None):
 # Update Character Level
 @bp_character.route('/characters/<id>/level', methods=['PUT'])
 def update_character_level(id=None):
-    character = Character.query.get(id)
+    character = models.Character.query.get(id)
 
     level = request.json['level']
 
@@ -103,7 +103,7 @@ def update_character_level(id=None):
 # Delete Character
 @bp_character.route('/characters/<id>', methods=['DELETE'])
 def delete_character(id=None):
-    character = Character.query.get(id)
+    character = models.Character.query.get(id)
     db.session.delete(character)
     db.session.commit()
     return character_schema.jsonify(character)

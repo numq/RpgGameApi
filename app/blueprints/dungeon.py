@@ -1,15 +1,14 @@
 # Create a Dungeon
 from datetime import timedelta, datetime
 
-from flask import request, jsonify, Blueprint
+from flask import request
 
+from app.blueprints import bp_dungeon
+from app.extensions import db
 from app.utilities import exceptions
 from app.utilities.generators import DungeonGenerator, AppGenerator
-from database.models import Dungeon
+from database import models
 from database.schemes import dungeons_schema, dungeon_schema
-from main import db
-
-bp_dungeon = Blueprint('dungeon', __name__)
 
 
 @bp_dungeon.route('/dungeons/create', methods=['POST'])
@@ -18,9 +17,9 @@ def create_dungeon():
     level = request.json['level']
     experience = request.json['experience']
 
-    new_dungeon = Dungeon(name=name, level=level, experience=experience)
+    new_dungeon = models.Dungeon(name=name, level=level, experience=experience)
 
-    if db.session.query(Dungeon).filter_by(id=new_dungeon.id).count() < 1:
+    if db.session.query(models.Dungeon).filter_by(id=new_dungeon.id).count() < 1:
         db.session.add(new_dungeon)
         db.session.commit()
 
@@ -35,21 +34,21 @@ def create_dungeon():
 # Get Single Dungeon
 @bp_dungeon.route('/dungeons/<id>', methods=['GET'])
 def get_dungeon(id=None):
-    dungeon = Dungeon.query.get(id)
+    dungeon = models.Dungeon.query.get(id)
     return dungeon_schema.jsonify(dungeon)
 
 
 # Get All Dungeons
 @bp_dungeon.route('/dungeons', methods=['GET'])
 def get_dungeons():
-    all_dungeons = Dungeon.query.all()
+    all_dungeons = models.Dungeon.query.all()
     return dungeons_schema.jsonify(all_dungeons)
 
 
 # Update a Dungeon
 @bp_dungeon.route('/dungeons/<id>', methods=['PUT'])
 def update_dungeon(id=None):
-    dungeon = Dungeon.query.get(id)
+    dungeon = models.Dungeon.query.get(id)
 
     id = request.json['id']
     name = request.json['name']
@@ -69,7 +68,7 @@ def update_dungeon(id=None):
 # Delete Dungeon
 @bp_dungeon.route('/dungeons/<id>', methods=['DELETE'])
 def delete_dungeon(id=None):
-    dungeon = Dungeon.query.get(id)
+    dungeon = models.Dungeon.query.get(id)
     db.session.delete(dungeon)
     db.session.commit()
     return dungeon_schema.jsonify(dungeon)
@@ -86,7 +85,7 @@ def generate_dungeon():
     experience = DungeonGenerator().generate_experience(level)
     duration = datetime.utcnow() + timedelta(minutes=DungeonGenerator().generate_duration())
 
-    new_dungeon = Dungeon(name=name, level=level, experience=experience, duration=duration)
+    new_dungeon = models.Dungeon(name=name, level=level, experience=experience, duration=duration)
 
     db.session.add(new_dungeon)
     db.session.commit()

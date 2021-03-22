@@ -1,13 +1,11 @@
-from datetime import timedelta, datetime
-
-from sqlalchemy import *
+from sqlalchemy import Column, Integer, Text, func, String, ForeignKey, JSON, Boolean
 from sqlalchemy.orm import relationship, backref
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from app.extensions import db
 from app.utilities import constants
-from app.utilities.generators import DungeonGenerator
 from database.enums import ItemType, ItemRarity
-from main import db
+from main import app
 
 
 class Base(db.Model):
@@ -73,8 +71,8 @@ class Item(Base):
     description = Column(String(120), nullable=True)
     dungeon_id = Column(Integer)
     level = Column(Integer)
-    rarity = Column(Enum(ItemRarity))
-    type = Column(Enum(ItemType))
+    rarity = Column(db.Enum(ItemRarity))
+    type = Column(db.Enum(ItemType))
     stats = Column(JSON)
     cost = Column(Integer)
     equipped = Column(Boolean)
@@ -88,7 +86,7 @@ class Ability(Base):
 
     name = Column(String(20))
     description = Column(String, nullable=True)
-    effect = Column(Enum, nullable=True)
+    effect = Column(db.Enum, nullable=True)
 
     def __repr__(self) -> str:
         return f"Ability({self.id}, {self.name}, {self.description}, {self.effect}, {self.created_on})"
@@ -106,5 +104,4 @@ class Dungeon(Base):
         return f"Dungeon({self.id}, {self.name}, {self.level}, {self.experience}, {self.duration}, {self.created_on})"
 
 
-db.create_all()
-db.create_all(bind=['db', 'test'])
+db.create_all(app=app, bind=['db', 'test'])

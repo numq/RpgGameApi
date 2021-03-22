@@ -1,17 +1,17 @@
-from flask import request, Blueprint
+from flask import request
 
+from app.blueprints import bp_item
+from app.extensions import db
 from app.utilities.generators import AppGenerator, ItemGenerator
-from database.models import Item, Dungeon, db
+from database import models
 from database.schemes import item_schema, items_schema
-
-bp_item = Blueprint('item', __name__)
 
 
 # Create Item
 @bp_item.route('/inventory/<character_id>/<id>', methods=['POST'])
 def create_item(character_id=None):
-    item = Item(character_id=character_id)
-    if db.session.query(Item).filter_by(id=item.id).count() < 1:
+    item = models.Item(character_id=character_id)
+    if db.session.query(models.Item).filter_by(id=item.id).count() < 1:
         db.session.add(item)
         db.session.commit()
 
@@ -21,21 +21,21 @@ def create_item(character_id=None):
 # Get Single Item
 @bp_item.route('/inventory/<character_id>/<id>', methods=['GET'])
 def get_item(character_id=None, id=None):
-    item = Item.query.get(id)
+    item = models.Item.query.get(id)
     return item_schema.jsonify(item)
 
 
 # Get Inventory
 @bp_item.route('/inventory/<character_id>', methods=['GET'])
 def get_inventory(character_id=None):
-    items = Item.query.filter_by(character_id=character_id).all()
+    items = models.Item.query.filter_by(character_id=character_id).all()
     return items_schema.jsonify(items)
 
 
 # Update Item
 @bp_item.route('/inventory/<character_id>/<id>', methods=['PUT'])
 def update_item(character_id=None, id=None):
-    item = Item.get(id).first()
+    item = models.Item.get(id).first()
 
     name = request.json['name']
     description = request.json['description']
@@ -62,7 +62,7 @@ def update_item(character_id=None, id=None):
 # Delete Item
 @bp_item.route('/inventory/<character_id>/<id>', methods=['DELETE'])
 def delete_item(id=None):
-    item = Item.query.get(id)
+    item = models.Item.query.get(id)
     db.delete(item)
     db.session.commit()
     return item_schema.jsonify(item)
@@ -72,7 +72,7 @@ def delete_item(id=None):
 @bp_item.route('/inventory/<character_id>/drop', methods=['POST'])
 def generate_drop(character_id=None):
     dungeon_id = request.json['dungeon_id']
-    dungeon = Dungeon.query.get(dungeon_id)
+    dungeon = models.Dungeon.query.get(dungeon_id)
 
     name = AppGenerator().generate_name_by_pattern('RandomItem')
 
@@ -82,7 +82,7 @@ def generate_drop(character_id=None):
     stats = ItemGenerator().generate_stats(level, rarity)
     cost = ItemGenerator().generate_cost(level, rarity)
 
-    item = Item()
+    item = models.Item()
 
     item.character_id = character_id
     item.name = name

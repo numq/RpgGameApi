@@ -1,20 +1,8 @@
-from flask_selfdoc import Selfdoc
-from flask_sqlalchemy import SQLAlchemy
-
-from app import create_app, register_blueprints
+from app import create_app
 from config import ProductionConfig
 
 # Init
 app = create_app(ProductionConfig)
-app.url_map.strict_slashes = False
-
-# Init db
-db = SQLAlchemy(app)
-
-# Auto doc
-auto = Selfdoc(app)
 
 if __name__ == "__main__":
-    register_blueprints(app)
-    db.init_app(app)
     app.run()
