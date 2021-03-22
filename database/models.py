@@ -5,7 +5,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.extensions import db
 from app.utilities import constants
 from database.enums import ItemType, ItemRarity
-from main import app
 
 
 class Base(db.Model):
@@ -102,6 +101,3 @@ class Dungeon(Base):
 
     def __repr__(self) -> str:
         return f"Dungeon({self.id}, {self.name}, {self.level}, {self.experience}, {self.duration}, {self.created_on})"
-
-
-db.create_all(app=app, bind=['db', 'test'])
