@@ -15,6 +15,6 @@ db = SQLAlchemy(app)
 auto = Selfdoc(app)
 
 if __name__ == "__main__":
-    db.init_app(app)
     register_blueprints(app)
+    db.init_app(app)
     app.run()
