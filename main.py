@@ -6,7 +6,6 @@ from config import ProductionConfig
 
 # Init
 app = create_app(ProductionConfig)
-register_blueprints(app)
 app.url_map.strict_slashes = False
 
 # Init db
@@ -17,4 +16,5 @@ auto = Selfdoc(app)
 
 if __name__ == "__main__":
     db.init_app(app)
+    register_blueprints(app)
     app.run()
