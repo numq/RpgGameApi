@@ -1,12 +1,9 @@
 import base64
 import os
 
-from app.utilities import constants
-
-basedir = os.path.abspath(os.path.dirname(__file__)) + f'{constants.DATABASE_PACKAGE}'
-basedir_test = os.path.abspath(os.path.dirname(__file__)) + f'{constants.DATABASE_PACKAGE_TEST}'
+basedir = os.path.abspath(os.path.dirname(__file__))
 main_db = os.path.join(basedir, 'db.sqlite')
-test_db = os.path.join(basedir_test, 'test.sqlite')
+test_db = os.path.join(basedir, 'test.sqlite')
 
 
 class Config:
@@ -23,9 +20,8 @@ class Config:
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
-
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, main_db)
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + main_db
 
 
 class TestConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, test_db)
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + test_db
