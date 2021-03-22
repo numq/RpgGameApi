@@ -6,7 +6,7 @@ from config import ProductionConfig
 
 # Init
 app = create_app(ProductionConfig)
-app.url_map.strict_slashes = False
+# app.url_map.strict_slashes = False
 
 # Init db
 db = SQLAlchemy(app)
